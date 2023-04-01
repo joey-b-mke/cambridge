@@ -24,7 +24,11 @@ function initConfig()
 	if not config.sfx_volume then config.sfx_volume = 0.5 end
 	if not config.bgm_volume then config.bgm_volume = 0.5 end
 	
-	if config.fullscreen == nil then config.fullscreen = false end
+	if love.system.getOS() == "iOS" then
+		config.fullscreen = true
+	elseif config.fullscreen == nil then 
+		config.fullscreen = false 
+	end
 	if config.secret == nil then config.secret = false end
 
 	if not config.gamesettings then config.gamesettings = {} end
@@ -35,7 +39,11 @@ function initConfig()
 	end
 	
 	if not config.input then
-		scene = InputConfigScene()
+		if love.system.getOS() == "iOS" then
+			scene = TitleScene()
+		else
+			scene = InputConfigScene()
+		end
 	else
 		if config.current_mode then current_mode = config.current_mode end
 		if config.current_ruleset then current_ruleset = config.current_ruleset end

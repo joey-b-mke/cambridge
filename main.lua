@@ -276,6 +276,54 @@ function love.wheelmoved(x, y)
 	scene:onInputPress({input=nil, type="wheel", x=x, y=y})
 end
 
+
+local touch_direction = nil
+local touch_direction_id = nil
+local current_touch_direction = nil
+
+function love.touchpressed(id, x, y, dx, dy, pressure)
+	if x < love.graphics.getWidth()/2 then
+	else 
+		scene:onInputPress({input="menu_decide"})
+	end
+end
+
+function love.touchmoved(id, x, y, dx, dy, pressure)
+	print("dx: " .. dx)
+	print("dy: " .. dy)
+	if x < love.graphics.getWidth()/2 then -- virtual joystick input
+		if math.abs(dx) > math.abs(dy) then -- horizontal direction
+			if math.abs(dx) >= 1.5 then
+				if dx > 0 then
+					touch_direction = "r"
+				else
+					touch_direction = "l"
+				end
+			end
+		else -- vertical direction
+			if touch_direction_id == nil and math.abs(dy) >= 1.5 then
+				if dy > 0 then
+					touch_direction = "d"
+				else
+					touch_direction = "u"
+				end
+			end
+		end
+		if current_touch_direction ~= nil and current_touch_direction ~= touch_direction then
+			scene:onInputRelease({input=directions[current_touch_direction], type="touch", direction=current_touch_direction})
+		end
+		scene:onInputPress({input=directions[touch_direction], type="touch", direction=touch_direction})
+		touch_direction_id = id
+		current_touch_direction = touch_direction
+	else -- virtual button input
+	end
+end
+
+function love.touchreleased( id, x, y, dx, dy, pressure )
+	scene:onInputRelease({input=directions[touch_direction], type="touch", direction=touch_direction})
+	touch_direction_id = nil
+end
+
 function love.focus(f)
 	if f then
 		resumeBGM(true)
